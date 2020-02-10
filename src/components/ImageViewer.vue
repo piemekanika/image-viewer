@@ -25,8 +25,8 @@
           Zoom out
         </button>
 
-        <button @click="resetZoom">
-          Reset zoom
+        <button @click="resetALl">
+          Reset all
         </button>
 
         <button @click="zoomIn">
@@ -35,10 +35,6 @@
 
         <button @click="rotateRight">
           Rotate right
-        </button>
-
-        <button @click="resetALl">
-          Reset all
         </button>
       </div>
     </div>
@@ -51,7 +47,7 @@ export default {
     return {
       rotateAngle: 0,
       zoom: 1,
-      zoomStep: 1.1,
+      zoomSpeed: 1.1,
       imageSrc: 'https://storage.googleapis.com/afs-prod/media/media:a834b3cc0c7c41d19c3a409b40752134/3000.jpeg',
       windowSize: {
         w: window.outerWidth,
@@ -67,7 +63,7 @@ export default {
       const container = this.$refs.container
 
       const styles = {
-        transform: `rotate(${this.rotateAngle}deg) scale(${this.zoom})`,
+        transform: `rotate(${this.rotateAngle}deg) scale(${this.zoom}) translateX(-50%) translateY(-50%)`,
         backgroundImage: `url('${this.imageSrc}')`
       }
 
@@ -87,8 +83,23 @@ export default {
   mounted() {
     this.$modal.show('modal')
 
-    document.addEventListener('keydown', event => {
-      if (event.ctrlKey && (event.which == '61' || event.which == '107' || event.which == '173' || event.which == '109'  || event.which == '187'  || event.which == '189'  ) ) {
+    document.addEventListener('keydown', this.handleKeydown)
+    document.addEventListener('wheel', this.handleMousewheel, { passive: false })
+  },
+  methods: {
+    handleMousewheel(event) {
+      if (event.ctrlKey) {
+        event.preventDefault()
+
+        if (event.deltaY > 0) {
+          this.zoomOut()
+        } else {
+          this.zoomIn()
+        }
+      }
+    },
+    handleKeydown(event) {
+      if (event.ctrlKey && [61, 107, 173, 109, 187, 189].includes(event.which)) {
         event.preventDefault()
 
         if ([187, 107].includes(event.which)) {
@@ -103,29 +114,15 @@ export default {
       } else if (event.which === 39) {
         this.rotateRight()
       }
-    })
-
-    window.addEventListener("wheel", event => {
-      if (event.ctrlKey) {
-        event.preventDefault()
-
-        if (event.deltaY > 0) {
-          this.zoomOut()
-        } else {
-          this.zoomIn()
-        }
-      }
-    }, { passive: false })
-  },
-  methods: {
+    },
     resetZoom() {
       this.zoom = 1
     },
     zoomIn() {
-      this.zoom *= this.zoomStep
+      this.zoom *= this.zoomSpeed
     },
     zoomOut() {
-      this.zoom /= this.zoomStep
+      this.zoom /= this.zoomSpeed
     },
     rotateLeft() {
       this.rotateAngle -= 90
@@ -182,8 +179,8 @@ export default {
     resetALl() {
       this.resetZoom()
       this.rotateAngle = 0
-      this.$refs.image.style.top = 0
-      this.$refs.image.style.left = 0
+      this.$refs.image.style.removeProperty('top')
+      this.$refs.image.style.removeProperty('left')
     }
   }
 }
@@ -206,10 +203,12 @@ export default {
       width: 100%;
 
       position: absolute;
-      top: 0;
-      left: 0;
+      top: 50%;
+      left: 50%;
 
       transition: transform .2s;
+
+      transform-origin: top left;
 
       background-size: contain;
       background-repeat: no-repeat;
