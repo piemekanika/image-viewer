@@ -36,6 +36,10 @@
         <button @click="rotateRight">
           Rotate right
         </button>
+
+        <button @click="resetALl">
+          Reset all
+        </button>
       </div>
     </div>
   </modal>
@@ -55,7 +59,7 @@ export default {
         iw: window.innerWidth,
         ih: window.innerHeight
       },
-      madeImageDraggable: false,
+      madeImageDraggable: false
     }
   },
   computed: {
@@ -67,7 +71,13 @@ export default {
         backgroundImage: `url('${this.imageSrc}')`
       }
 
-      if (this.rotateAngle % 180) {
+      let imageWidth = Infinity
+
+      if (this.$refs.image) {
+        imageWidth = this.$refs.image.getBoundingClientRect().width
+      }
+
+      if (this.rotateAngle % 180 && container.offsetHeight < imageWidth) {
         styles.width = `${container.offsetHeight}px`
       }
 
@@ -79,13 +89,19 @@ export default {
 
     document.addEventListener('keydown', event => {
       if (event.ctrlKey && (event.which == '61' || event.which == '107' || event.which == '173' || event.which == '109'  || event.which == '187'  || event.which == '189'  ) ) {
-        event.preventDefault();
+        event.preventDefault()
 
         if ([187, 107].includes(event.which)) {
           this.zoomIn()
         } else if ([109, 189].includes(event.which)) {
           this.zoomOut()
         }
+      }
+
+      if (event.which === 37) {
+        this.rotateLeft()
+      } else if (event.which === 39) {
+        this.rotateRight()
       }
     })
 
@@ -99,7 +115,7 @@ export default {
           this.zoomIn()
         }
       }
-    }, { passive: false });  
+    }, { passive: false })
   },
   methods: {
     resetZoom() {
@@ -130,42 +146,44 @@ export default {
           el.onmousedown = dragMouseDown
 
           function dragMouseDown(e) {
-            e = e || window.event;
-            e.preventDefault();
+            e = e || window.event
+            e.preventDefault()
             // get the mouse cursor position at startup:
-            pos3 = e.clientX;
-            pos4 = e.clientY;
-            document.onmouseup = closeDragElement;
+            pos3 = e.clientX
+            pos4 = e.clientY
+            document.onmouseup = closeDragElement
             // call a function whenever the cursor moves:
-            document.onmousemove = elementDrag;
+            document.onmousemove = elementDrag
           }
 
           function elementDrag(e) {
-            e = e || window.event;
-            e.preventDefault();
+            e = e || window.event
+            e.preventDefault()
             // calculate the new cursor position:
-            pos1 = pos3 - e.clientX;
-            pos2 = pos4 - e.clientY;
-            pos3 = e.clientX;
-            pos4 = e.clientY;
+            pos1 = pos3 - e.clientX
+            pos2 = pos4 - e.clientY
+            pos3 = e.clientX
+            pos4 = e.clientY
             // set the element's new position:
-            el.style.top = (el.offsetTop - pos2) + "px";
-            el.style.left = (el.offsetLeft - pos1) + "px";
+            el.style.top = (el.offsetTop - pos2) + "px"
+            el.style.left = (el.offsetLeft - pos1) + "px"
           }
 
           function closeDragElement() {
             // stop moving when mouse button is released:
-            document.onmouseup = null;
-            document.onmousemove = null;
+            document.onmouseup = null
+            document.onmousemove = null
           }
         }
 
-        // this.$nextTick(() => {
-        // const element = document.querySelector('.viewer__image')
-        //   console.log(element)
         dragElement(this.$refs.image)
-        // })
       }
+    },
+    resetALl() {
+      this.resetZoom()
+      this.rotateAngle = 0
+      this.$refs.image.style.top = 0
+      this.$refs.image.style.left = 0
     }
   }
 }
