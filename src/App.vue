@@ -1,28 +1,39 @@
 <template>
-  <div id="app">
-    <img alt="Vue logo" src="./assets/logo.png">
-    <HelloWorld msg="Welcome to Your Vue.js App"/>
+  <div>
+    <showcase />
   </div>
 </template>
 
 <script>
-import HelloWorld from './components/HelloWorld.vue'
-
 export default {
-  name: 'App',
   components: {
-    HelloWorld
+    showcase: () => import('./components/ImageViewer.vue')
   }
 }
 </script>
 
 <style lang="scss">
-#app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
-  margin-top: 60px;
+button {
+  border: 2px solid rgb(142, 88, 185);
+  border-radius: 5px;
+
+  color: rgb(142, 88, 185);
+  font-size: 16px;
+  text-transform: uppercase;
+  font-weight: bold;
+
+  background: transparent;
+
+  padding: 7px 14px;
+
+  cursor: pointer;
+
+  outline: none;
+
+  transition: all .2s ease-in;
+
+  &:hover {
+    background-color: rgba(142, 88, 185, .2);
+  }
 }
 </style>
